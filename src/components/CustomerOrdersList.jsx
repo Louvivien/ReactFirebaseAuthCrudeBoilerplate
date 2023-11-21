@@ -14,9 +14,11 @@ const CustomerOrdersList = () => {
     let isMounted = true;
 
     const fetchOrders = async () => {
-      if (currentUser && currentUser.displayName && isMounted) {
+      if (currentUser && isMounted) {
         try {
-          const q = query(collection(db, "orders"), where("customerName", "==", currentUser.displayName));
+          // Use displayName if it exists, otherwise fallback to email
+          const customerIdentifier = currentUser.displayName || currentUser.email;
+          const q = query(collection(db, "orders"), where("customerName", "==", customerIdentifier));
           const querySnapshot = await getDocs(q);
           const fetchedOrders = [];
           querySnapshot.forEach((doc) => {
@@ -81,7 +83,11 @@ const CustomerOrdersList = () => {
         <Tr key={order.id}>
           <Td>{order.productName}</Td>
           <Td>{order.quantity}</Td>
-          <Td>{order.customerName}</Td>
+          <Td>
+            
+          {order.customerName || currentUser.email}
+          
+          </Td>
           <Td>
             <Button colorScheme='blue' onClick={() => handleRenewOrder(order)}>Renew</Button>
             <Button colorScheme='gray' onClick={() => handleDeleteOrder(order.id)} ml={2}>Delete</Button>

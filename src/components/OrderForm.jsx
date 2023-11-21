@@ -9,7 +9,7 @@ import { Button } from '@chakra-ui/react';
 
 const OrderForm = () => {
   const { currentUser } = useAuth();
-  const initialCustomerName = currentUser?.displayName || '';
+  const initialCustomerName = currentUser?.displayName || currentUser?.email || '';
 
   const [order, setOrder] = useState({
     productName: '',
@@ -18,8 +18,9 @@ const OrderForm = () => {
   });
 
   useEffect(() => {
-    if (currentUser && currentUser.displayName) {
-      setOrder(prevOrder => ({ ...prevOrder, customerName: currentUser.displayName }));
+    if (currentUser) {
+      const nameToUse = currentUser.displayName || currentUser.email;
+      setOrder(prevOrder => ({ ...prevOrder, customerName: nameToUse }));
     }
   }, [currentUser]);
 
@@ -60,7 +61,7 @@ const OrderForm = () => {
       />
       <input 
         type="text" 
-        value={order.customerName} 
+        value={order.customerName || currentUser?.email || ''}
         readOnly 
         placeholder="Customer Name"
       />
